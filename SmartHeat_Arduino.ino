@@ -21,11 +21,7 @@ void setup()
 void loop()
 {
   //to debug server response
-  while (wifly.available()) 
-  {
-    char c = wifly.read();
-    debug.print(c);
-  }
+  wifi_read();
   
   switch(STATE)
   {
@@ -49,6 +45,7 @@ void loop()
       {
         wifly.setOUTPUT("0x10 0x70");
         STATE = EXIT;
+        debug.println("State: Exit");
       }
       else
       {
