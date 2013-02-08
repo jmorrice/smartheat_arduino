@@ -12,23 +12,31 @@ state STATE = INIT;
 
 void setup()
 {
-  wifi_init();
-  
+  //wifi_init();
+  zilog_init();
   //softwareserial for debugging
   debug.begin(9600);
+  //temp_init();
 }
 
 void loop()
 {
   //to debug server response
-  wifi_read();
+  //wifi_read();
   
   switch(STATE)
   {
     case INIT:
-      debug.println("State: Init");
+      //debug.println("State: Init");
       //next state
-      STATE = CONNECT;
+      if(zilog_detect_motion())
+        digitalWrite(13, HIGH);
+      else
+        digitalWrite(13, LOW);
+      delay(100);
+      //debug.println(temp_read());
+      //STATE = CONNECT;
+      //STATE = EXIT;
       break;
     
     case CONNECT:
