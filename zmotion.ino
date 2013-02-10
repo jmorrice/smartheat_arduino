@@ -21,7 +21,6 @@ void zilog_debug()
 boolean zilog_detect_motion()
 {
   zilog.print("a");
-  //delay(2);
   if(zilog.available())
   {
     char c = zilog.read();

@@ -1,12 +1,14 @@
 /* Change these to match your WiFi network */
-const char mySSID[] = "Jonny_iPhone";
-const char myPassword[] = "mdv2posh4u";
+//const char mySSID[] = "Jonny_iPhone";
+//const char myPassword[] = "mdv2posh4u";
+const char mySSID[] = "virginmedia8629341";
+const char myPassword[] = "pqclfnwp";
 
 /* FE Server */
 IPAddress server(152,78,189,14);
 
 /* Test data to send */
-int h = 100;
+//int h = 20;
 
 boolean wifi_init()
 {
@@ -49,7 +51,7 @@ boolean wifi_connect()
   }
 }
 
-boolean wifi_send()
+boolean wifi_send(int temp)
 {      
   if (wifly.open(server, 80))  
   {
@@ -58,14 +60,17 @@ boolean wifi_send()
     
     
     //Send the request
-    wifly.println("POST //fe/rawinput/sensor/90-A2-DA-00-ED-21/temperature/data/ HTTP/1.1");
-    wifly.println("User-Agent: curl/7.24.0 (x86_64-apple-darwin12.0) libcurl/7.24.0 OpenSSL/0.9.8r zlib/1.2.5");
+    wifly.println("POST //fe/rawinput/sensor/00-06-66-80-EC-76/temperature/data/ HTTP/1.1");
+    //wifly.println("POST //fe/rawinput/sensor/90-A2-DA-00-ED-21/temperature/data/ HTTP/1.1");
     wifly.println("Host: hai.ecs.soton.ac.uk");
     wifly.println("Accept: */*");
-    wifly.println("Content-Length: 30");
+    wifly.println("Content-Length: " + String(getLength(temp) + 28));
     wifly.println("Content-Type: application/x-www-form-urlencoded");
     wifly.println();
-    wifly.println("value=20&key=90-A2-DA-00-ED-21");
+    String data = String("value=" + String(temp));
+    //debug.println(data);
+    wifly.println(data + String("&key=00-06-66-80-EC-76"));
+    //wifly.println(data + String("&key=90-A2-DA-00-ED-21"));
     wifly.println();
     wifly.println();
 
