@@ -15,7 +15,7 @@ void setup()
   //wifi_init();
   zilog_init();
   //softwareserial for debugging
-  debug.begin(9600);
+  //debug.begin(9600);
   //temp_init();
 }
 
@@ -33,7 +33,7 @@ void loop()
         digitalWrite(13, HIGH);
       else
         digitalWrite(13, LOW);
-      delay(100);
+      delay(200);
       //debug.println(temp_read());
       //STATE = CONNECT;
       //STATE = EXIT;
