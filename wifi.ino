@@ -16,19 +16,29 @@ boolean wifi_init()
   Serial.begin(9600);
   if(!wifly.begin(&Serial, NULL))
   {
+    debug.println("Serial communication error.");
     //error handling
     return false;
   }
   else
   {
     //init leds
-    wifly.setIOFUNC("0x70");
-    wifly.setOUTPUT("0x00 0x70");
+    wifly.factoryRestore();
+    wifly.reboot();
+    //wifly.setIOFUNC("0x70");
+    //wifly.setOUTPUT("0x00 0x70");
+    
+    //TODO: Fix LED issue
     
     //init wifi
     wifly.setAUTH("4");
     wifly.setSSID(mySSID);
     wifly.setPassphrase(myPassword);
+    wifly.setSleepTrig("1");
+    debug.println("saving...");
+    wifly.save();
+    debug.println("rebooting...");
+    wifly.reboot();
     return true;
   }
 }
@@ -52,12 +62,18 @@ boolean wifi_connect()
 }
 
 boolean wifi_send(int temp)
-{      
+{
+  //TODO: optimize to keep existing connection
+  if(wifly.isConnected()) 
+  {
+    debug.println("Old connection active. Closing");
+    wifly.close();
+  }
+  
   if (wifly.open(server, 80))  
   {
     debug.print("Connected to ");
     debug.println(server);
-    
     
     //Send the request
     wifly.println("POST //fe/rawinput/sensor/00-06-66-80-EC-76/temperature/data/ HTTP/1.1");
@@ -112,4 +128,19 @@ int getLength(int someValue)
   }
   // return the number of digits:
   return digits;
+}
+
+void wifi_sleep()
+{
+  //wifly.close();
+  wifly.sleep();
+  //wifly.print("$$$");
+  //wifly.println("sleep 0x0");
+}
+
+void wifi_wake()
+{
+  wifly.println();
+  wifly.println();
+  wifly.enterCommand();
 }
