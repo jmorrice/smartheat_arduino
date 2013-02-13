@@ -1,6 +1,3 @@
-/* Serial for ZMotion detection */
-SoftwareSerial zilog(2, 3);
-
 void zilog_init()
 {
   pinMode(2, INPUT);
@@ -20,15 +17,15 @@ void zilog_debug()
 boolean zilog_detect_motion()
 {
   boolean output = false;
-  /*
+  
   zilog.print("a");
+  delay(1);
   if(zilog.available())
   {
-    char c = zilog.read();
-    if(c == 'Y')
+    if((char)zilog.read() == 'Y')
       output = true;
   }
-  */
+  
   return output;
 }
 

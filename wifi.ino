@@ -66,11 +66,11 @@ boolean wifi_connect()
 boolean wifi_send(double temp, boolean presence)
 {
   //TODO: optimize to keep existing connection
-  if(wifly.isConnected()) 
-  {
+  //if(wifly.isConnected()) 
+  //{
     //debug.println("Old connection active. Closing");
-    wifly.close();
-  }
+    //wifly.close();
+  //}
   
   if (wifly.open(server, 80))  
   {

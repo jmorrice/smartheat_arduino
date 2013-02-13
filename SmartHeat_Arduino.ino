@@ -11,7 +11,10 @@ boolean presence_array [30];
 unsigned int t_transmit_min = 2;  //transimission period in minutes
 unsigned int t_transmit = t_transmit_min * 60;  //in seconds
 unsigned int t_motion = 4;    //motion sample period in seconds
-unsigned int motion_thresh = 1;  //threshold for motion detection
+unsigned int motion_thresh = 3;  //threshold for motion detection
+
+/* Serial for ZMotion detection */
+SoftwareSerial zilog(2, 3);
 
 /* For Debugging */
 //SoftwareSerial debug(10, 11);
@@ -45,19 +48,16 @@ void loop()
     case INIT:
       //debug.println("State: Init");
       wifi_init();
-      zilog_init();
       temp_init();
+      zilog_init();
       sample_count = 0;
       
       wifi_sleep();
-      //next state
       STATE = READ;
-      //STATE = SEND;
       break;
       
     case READ:
       presence_array[sample_count] = zilog_detect_motion();
-      //wifly.println(presence_array[sample_count]);
       sample_count++;
       STATE = SLEEP;
       break;
@@ -114,6 +114,8 @@ void loop()
         {
           ATTEMPTS = 0;
           wifly.setOUTPUT("0x40 0x70");
+          sample_count = 0;
+          wifi_sleep();
           STATE = SLEEP;
         }
       }
