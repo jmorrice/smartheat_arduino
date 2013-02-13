@@ -8,7 +8,7 @@ void temp_init()
   Wire.begin();
 }
 
-int temp_read()
+double temp_read()
 {
   Wire.beginTransmission(adr);
   Wire.write(byte(0x05));  //request ambient temperature
@@ -20,17 +20,17 @@ int temp_read()
     byte upperByte, lowerByte;
     upperByte = Wire.read();
     lowerByte = Wire.read();
-    debug.println(upperByte);
-    debug.println(lowerByte);
+    //debug.println(upperByte);
+    //debug.println(lowerByte);
     return temp_convert(upperByte, lowerByte);
   }
   else
-    return int(0); //error
+    return double(0); //error
 }
 
-float temp_convert(byte upper, byte lower)
+double temp_convert(byte upper, byte lower)
 {
-  float temp;
+  double temp;
   //check flag bits
   if((upper & byte(0x80)) == byte(0x80))
   {
@@ -48,10 +48,10 @@ float temp_convert(byte upper, byte lower)
   if((upper & byte(0x10)) == byte(0x10))
   {
     upper = upper & byte(0x0F);  //clear sign
-    temp = 256 - ((upper * 16) + (lower / 16));
+    temp = 256 - ((upper * 16.0) + (lower / 16.0));
   }
   else
-    temp = (upper * 16) + (lower / 16);
-    
+    temp = (upper * 16.0) + (lower / 16.0);
+
   return temp;
 }

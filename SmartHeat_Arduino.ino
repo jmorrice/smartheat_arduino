@@ -4,17 +4,24 @@
 
 WiFly wifly;
 
+/* Sensor values */
+boolean presence_array [30];
+
+/* Settings */ //be aware of also changing sample bufer size (below) and watchdog timer (in sleep file)
+unsigned int t_transmit_min = 2;  //transimission period in minutes
+unsigned int t_transmit = t_transmit_min * 60;  //in seconds
+unsigned int t_motion = 4;    //motion sample period in seconds
+unsigned int motion_thresh = 1;  //threshold for motion detection
+
 /* For Debugging */
-SoftwareSerial debug(10, 11);
+//SoftwareSerial debug(10, 11);
 
 /* FSM */
-Timer t;
-int timer_event_id;
-enum state {INIT, WAIT, CONNECT, SEND, SLEEP, WAKE, EXIT};
+enum state {INIT, READ, CONNECT, SEND, SLEEP, WAKE, EXIT};
 state STATE = INIT;
+unsigned int sample_count = 0;
 
 /* Flags */
-boolean SLEEP_FLAG = false;
 
 /* Timeouts */
 unsigned int ATTEMPTS = 0;
@@ -23,34 +30,41 @@ unsigned int MAX_ATTEMPTS = 3;
 void setup()
 {
   //softwareserial for debugging (not compatible with zmotion)
-  debug.begin(9600);
-  debug.println("setup");
-  wifi_init();
-  //zilog_init();
-  temp_init();
-  
-  timer_event_id = t.every(120000, upload); //every 2 minutes
+  //debug.begin(9600);
+  //debug.println("setup");
 }
 
 void loop()
 {
-  debug.println("loop");
+  //debug.println("loop");
   //to debug server response
-  wifi_read();
-  
-  t.update();
+  //wifi_read();
   
   switch(STATE)
   {
     case INIT:
-      debug.println("State: Init");
+      //debug.println("State: Init");
+      wifi_init();
+      zilog_init();
+      temp_init();
+      sample_count = 0;
+      
+      wifi_sleep();
       //next state
+      STATE = READ;
+      //STATE = SEND;
+      break;
+      
+    case READ:
+      presence_array[sample_count] = zilog_detect_motion();
+      //wifly.println(presence_array[sample_count]);
+      sample_count++;
       STATE = SLEEP;
       break;
     
     //TODO: add connect timeout
     case CONNECT:
-      debug.println("State: Connect");
+      //debug.println("State: Connect");
       wifly.setOUTPUT("0x20 0x70");
       if (!wifly.isAssociated())
       {
@@ -62,27 +76,34 @@ void loop()
       break;
       
     case SLEEP:
-      debug.println("send to sleep...");
-      if(!SLEEP_FLAG)
-      {
-        wifi_sleep();
-        SLEEP_FLAG = true;
-      }
+      //debug.println("send to sleep...");
+      avr_sleep();
+      STATE = WAKE;
       break;
       
     case WAKE:
-      debug.println("waking up...");
-      wifi_wake();
-      STATE = SEND;
+      if(sample_count * t_motion >= t_transmit)
+      {
+        //wifly.println(sample_count);
+        //wifly.println(t_motion);
+        //wifly.println(t_transmit);
+        wifi_wake();
+        STATE = SEND;
+      }
+      else  
+        STATE = READ;
       break;
       
     case SEND:
-      debug.println("State: Send");
+      //debug.println("State: Send");
       wifly.setOUTPUT("0x30 0x70");
-      if(wifi_send(temp_read()))
+      if(wifi_send(temp_read(), zilog_process(&presence_array[0], motion_thresh)))
+      //if(wifi_send(temp_read(), 1))
       {
         wifly.setOUTPUT("0x10 0x70");
         ATTEMPTS = 0;
+        sample_count = 0;
+        wifi_sleep();
         STATE = SLEEP;
       }
       else
@@ -99,7 +120,6 @@ void loop()
       break;
       
     case EXIT:
-      t.stop(timer_event_id);
       wifly.factoryRestore();
       break;
   }
@@ -107,7 +127,6 @@ void loop()
 
 void upload()
 {
-  debug.println("timerevent");
-  SLEEP_FLAG = false;
+  //debug.println("timerevent");
   STATE = WAKE;
 }

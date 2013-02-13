@@ -1,3 +1,5 @@
+#include <avr-libc.h>
+
 /* Change these to match your WiFi network */
 //const char mySSID[] = "Jonny_iPhone";
 //const char myPassword[] = "mdv2posh4u";
@@ -16,7 +18,7 @@ boolean wifi_init()
   Serial.begin(9600);
   if(!wifly.begin(&Serial, NULL))
   {
-    debug.println("Serial communication error.");
+    //debug.println("Serial communication error.");
     //error handling
     return false;
   }
@@ -35,9 +37,9 @@ boolean wifi_init()
     wifly.setSSID(mySSID);
     wifly.setPassphrase(myPassword);
     wifly.setSleepTrig("1");
-    debug.println("saving...");
+    //debug.println("saving...");
     wifly.save();
-    debug.println("rebooting...");
+    //debug.println("rebooting...");
     wifly.reboot();
     return true;
   }
@@ -45,60 +47,84 @@ boolean wifi_init()
 
 boolean wifi_connect()
 {
-  debug.println("Joining network");
+  //debug.println("Joining network");
   if (wifly.join()) 
   {
      //connected
-     debug.println("Joined wifi network");
+     //debug.println("Joined wifi network");
      return true;
      //led_on();
   } 
   else 
   {
     //error handling
-    debug.println("Failed to join wifi network");
+    //debug.println("Failed to join wifi network");
     return false;
   }
 }
 
-boolean wifi_send(int temp)
+boolean wifi_send(double temp, boolean presence)
 {
   //TODO: optimize to keep existing connection
   if(wifly.isConnected()) 
   {
-    debug.println("Old connection active. Closing");
+    //debug.println("Old connection active. Closing");
     wifly.close();
   }
   
   if (wifly.open(server, 80))  
   {
-    debug.print("Connected to ");
-    debug.println(server);
+    //debug.print("Connected to ");
+    //debug.println(server);
+    
     
     //Send the request
     wifly.println("POST //fe/rawinput/sensor/00-06-66-80-EC-76/temperature/data/ HTTP/1.1");
     //wifly.println("POST //fe/rawinput/sensor/90-A2-DA-00-ED-21/temperature/data/ HTTP/1.1");
     wifly.println("Host: hai.ecs.soton.ac.uk");
     wifly.println("Accept: */*");
-    wifly.println("Content-Length: " + String(getLength(temp) + 28));
+    //wifly.println("Content-Length: " + String(getLength(temp) + 28));
+    wifly.println("Content-Length: " + String(5 + 28));
     wifly.println("Content-Type: application/x-www-form-urlencoded");
     wifly.println();
-    String data = String("value=" + String(temp));
+    //String data = String("value=" + String(temp));
+    char temp_str[5];
+    dtostrf(temp, 5, 2, temp_str);
+    String data = String("value=" + String(temp_str));
     //debug.println(data);
     wifly.println(data + String("&key=00-06-66-80-EC-76"));
     //wifly.println(data + String("&key=90-A2-DA-00-ED-21"));
     wifly.println();
     wifly.println();
+    
+    //presence
+    wifly.println("POST //fe/rawinput/sensor/00-06-66-80-EC-76/presence/data/ HTTP/1.1");
+    //wifly.println("POST //fe/rawinput/sensor/90-A2-DA-00-ED-21/temperature/data/ HTTP/1.1");
+    wifly.println("Host: hai.ecs.soton.ac.uk");
+    wifly.println("Accept: */*");
+    //wifly.println("Content-Length: " + String(getLength(temp) + 28));
+    wifly.println("Content-Length: " + String(1 + 28));
+    wifly.println("Content-Type: application/x-www-form-urlencoded");
+    wifly.println();
+    //String data = String("value=" + String(temp));
+    //char temp_str[5];
+    //dtostrf(temp, 5, 2, temp_str);
+    String data2 = String("value=" + String(presence));
+    //debug.println(data);
+    wifly.println(data2 + String("&key=00-06-66-80-EC-76"));
+    //wifly.println(data + String("&key=90-A2-DA-00-ED-21"));
+    wifly.println();
+    wifly.println();
 
     //read response
-    delay(5000);
-    wifi_read();
+    //delay(1000);
+    //wifi_read();
     return true;
   }
   else
   {
     //error
-    debug.println("Failed to connect");
+    //debug.println("Failed to connect");
     return false;
   }
 }
@@ -109,7 +135,7 @@ void wifi_read()
     {
       //debug.println("reading byte...");
       char c = wifly.read();
-      debug.print(c);
+      //debug.print(c);
     }
 }
 

@@ -6,8 +6,6 @@ void zilog_init()
   pinMode(2, INPUT);
   pinMode(3, OUTPUT);
   zilog.begin(9600);
-  Serial.begin(9600);
-  pinMode(13, OUTPUT);  
 }
 
 void zilog_debug()
@@ -18,17 +16,30 @@ void zilog_debug()
     zilog.print((char)Serial.read());
 }
 
+//TODO: add sleep functionality
 boolean zilog_detect_motion()
 {
+  boolean output = false;
+  /*
   zilog.print("a");
   if(zilog.available())
   {
     char c = zilog.read();
     if(c == 'Y')
-      return true;
-    else
-      return false; 
+      output = true;
   }
+  */
+  return output;
+}
+
+boolean zilog_process(boolean *values, unsigned int thresh)
+{
+  unsigned int sum = 0;
+  for(int i = 0; i < (t_transmit/t_motion); i++)
+    sum += values[i];
+    
+  if(sum >= thresh)
+    return true;
   else
-    return false;
+    return false;  
 }
