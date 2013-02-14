@@ -35,6 +35,7 @@ void setup()
   //softwareserial for debugging (not compatible with zmotion)
   //debug.begin(9600);
   //debug.println("setup");
+  humidity_init();
 }
 
 void loop()
@@ -50,6 +51,7 @@ void loop()
       wifi_init();
       temp_init();
       zilog_init();
+      humidity_init();
       sample_count = 0;
       
       wifi_sleep();
@@ -97,7 +99,7 @@ void loop()
     case SEND:
       //debug.println("State: Send");
       wifly.setOUTPUT("0x30 0x70");
-      if(wifi_send(temp_read(), zilog_process(&presence_array[0], motion_thresh)))
+      if(wifi_send(temp_read(), zilog_process(&presence_array[0], motion_thresh), ldr_read(), humidity_read()))
       //if(wifi_send(temp_read(), 1))
       {
         wifly.setOUTPUT("0x10 0x70");

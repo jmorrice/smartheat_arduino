@@ -1,10 +1,10 @@
 #include <avr-libc.h>
 
 /* Change these to match your WiFi network */
-//const char mySSID[] = "Jonny_iPhone";
-//const char myPassword[] = "mdv2posh4u";
-const char mySSID[] = "virginmedia8629341";
-const char myPassword[] = "pqclfnwp";
+const char mySSID[] = "Jonny_iPhone";
+const char myPassword[] = "mdv2posh4u";
+//const char mySSID[] = "virginmedia8629341";
+//const char myPassword[] = "pqclfnwp";
 
 /* FE Server */
 IPAddress server(152,78,189,14);
@@ -63,7 +63,7 @@ boolean wifi_connect()
   }
 }
 
-boolean wifi_send(double temp, boolean presence)
+boolean wifi_send(double temp, boolean presence, double light, int humid)
 {
   //TODO: optimize to keep existing connection
   //if(wifly.isConnected()) 
@@ -112,6 +112,42 @@ boolean wifi_send(double temp, boolean presence)
     String data2 = String("value=" + String(presence));
     //debug.println(data);
     wifly.println(data2 + String("&key=00-06-66-80-EC-76"));
+    //wifly.println(data + String("&key=90-A2-DA-00-ED-21"));
+    wifly.println();
+    wifly.println();
+    
+    //light
+    wifly.println("POST //fe/rawinput/sensor/00-06-66-80-EC-76/light/data/ HTTP/1.1");
+    wifly.println("Host: hai.ecs.soton.ac.uk");
+    wifly.println("Accept: */*");
+    //wifly.println("Content-Length: " + String(getLength(temp) + 28));
+    wifly.println("Content-Length: " + String(5 + 28));
+    wifly.println("Content-Type: application/x-www-form-urlencoded");
+    wifly.println();
+    //String data = String("value=" + String(temp));
+    char light_str[5];
+    dtostrf(light, 5, 2, light_str);
+    String data3 = String("value=" + String(light_str));
+
+    wifly.println(data3 + String("&key=00-06-66-80-EC-76"));
+    //wifly.println(data + String("&key=90-A2-DA-00-ED-21"));
+    wifly.println();
+    wifly.println();
+    
+    //humidity
+    wifly.println("POST //fe/rawinput/sensor/00-06-66-80-EC-76/humidity/data/ HTTP/1.1");
+    wifly.println("Host: hai.ecs.soton.ac.uk");
+    wifly.println("Accept: */*");
+    //wifly.println("Content-Length: " + String(getLength(temp) + 28));
+    wifly.println("Content-Length: " + String(5 + 28));
+    wifly.println("Content-Type: application/x-www-form-urlencoded");
+    wifly.println();
+    //String data = String("value=" + String(temp));
+    char humid_str[5];
+    dtostrf(humid, 5, 2, humid_str);
+    String data4 = String("value=" + String(humid_str));
+
+    wifly.println(data4 + String("&key=00-06-66-80-EC-76"));
     //wifly.println(data + String("&key=90-A2-DA-00-ED-21"));
     wifly.println();
     wifly.println();
