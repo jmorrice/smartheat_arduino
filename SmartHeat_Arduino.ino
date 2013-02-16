@@ -20,15 +20,9 @@ SoftwareSerial zilog(2, 3);
 //SoftwareSerial debug(10, 11);
 
 /* FSM */
-enum state {INIT, READ, CONNECT, SEND, SLEEP, WAKE, EXIT};
+enum state {INIT, READ, SEND, SLEEP, WAKE, EXIT};
 state STATE = INIT;
 unsigned int sample_count = 0;
-
-/* Flags */
-
-/* Timeouts */
-unsigned int ATTEMPTS = 0;
-unsigned int MAX_ATTEMPTS = 3;
 
 void setup()
 {
@@ -63,19 +57,6 @@ void loop()
       sample_count++;
       STATE = SLEEP;
       break;
-    
-    //TODO: add connect timeout
-    case CONNECT:
-      //debug.println("State: Connect");
-      wifly.setOUTPUT("0x20 0x70");
-      if (!wifly.isAssociated())
-      {
-        if(wifi_connect())
-          STATE = SEND;
-      }
-      else
-        STATE = SEND;
-      break;
       
     case SLEEP:
       //debug.println("send to sleep...");
@@ -90,6 +71,7 @@ void loop()
         //wifly.println(t_motion);
         //wifly.println(t_transmit);
         wifi_wake();
+        timeout_start();
         STATE = SEND;
       }
       else  
@@ -100,26 +82,12 @@ void loop()
       //debug.println("State: Send");
       wifly.setOUTPUT("0x30 0x70");
       if(wifi_send(temp_read(), zilog_process(&presence_array[0], motion_thresh), ldr_read(), humidity_read()))
-      //if(wifi_send(temp_read(), 1))
       {
         wifly.setOUTPUT("0x10 0x70");
-        ATTEMPTS = 0;
         sample_count = 0;
+        timeout_stop();
         wifi_sleep();
         STATE = SLEEP;
-      }
-      else
-      {
-        if(ATTEMPTS < MAX_ATTEMPTS)
-          ATTEMPTS++;
-        else
-        {
-          ATTEMPTS = 0;
-          wifly.setOUTPUT("0x40 0x70");
-          sample_count = 0;
-          wifi_sleep();
-          STATE = SLEEP;
-        }
       }
       break;
       

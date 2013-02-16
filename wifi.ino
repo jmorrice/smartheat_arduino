@@ -1,10 +1,10 @@
 #include <avr-libc.h>
 
 /* Change these to match your WiFi network */
-const char mySSID[] = "Jonny_iPhone";
-const char myPassword[] = "mdv2posh4u";
-//const char mySSID[] = "virginmedia8629341";
-//const char myPassword[] = "pqclfnwp";
+//const char mySSID[] = "Jonny_iPhone";
+//const char myPassword[] = "mdv2posh4u";
+const char mySSID[] = "virginmedia8629341";
+const char myPassword[] = "pqclfnwp";
 
 /* FE Server */
 IPAddress server(152,78,189,14);
