@@ -45,24 +45,6 @@ boolean wifi_init()
   }
 }
 
-boolean wifi_connect()
-{
-  //debug.println("Joining network");
-  if (wifly.join()) 
-  {
-     //connected
-     //debug.println("Joined wifi network");
-     return true;
-     //led_on();
-  } 
-  else 
-  {
-    //error handling
-    //debug.println("Failed to join wifi network");
-    return false;
-  }
-}
-
 boolean wifi_send(double temp, boolean presence, double light, int humid)
 {
   //TODO: optimize to keep existing connection

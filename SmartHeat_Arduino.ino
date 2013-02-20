@@ -29,7 +29,6 @@ void setup()
   //softwareserial for debugging (not compatible with zmotion)
   //debug.begin(9600);
   //debug.println("setup");
-  humidity_init();
 }
 
 void loop()
@@ -60,7 +59,8 @@ void loop()
       
     case SLEEP:
       //debug.println("send to sleep...");
-      avr_sleep();
+      //avr_sleep();
+      delay(4000);
       STATE = WAKE;
       break;
       
