@@ -4,13 +4,13 @@
 //const char mySSID[] = "Jonny_iPhone";
 //const char myPassword[] = "mdv2posh4u";
 
-const char mySSID[] = "ECS-WLAN";
-const char myPassword[] = "non";
-String macAddress = "00-06-66-80-13-9E";    //vangelis' sensor
-//String macAddress = "00-06-66-80-EC-76";  //jonathan's sensor
+//const char mySSID[] = "ECS-WLAN";
+//const char myPassword[] = "";
+//String macAddress = "00-06-66-80-13-9E";    //vangelis' sensor
+String macAddress = "00-06-66-80-EC-76";  //jonathan's sensor
 
-//const char mySSID[] = "virginmedia8629341";
-//const char myPassword[] = "pqclfnwp";
+const char mySSID[] = "virginmedia8629341";
+const char myPassword[] = "pqclfnwp";
 
 /* FE Server */
 IPAddress server(152,78,189,14);

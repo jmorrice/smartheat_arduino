@@ -44,13 +44,12 @@ void loop()
     case INIT:
       //debug.println("State: Init");
       wifi_init();
-      temp_init();
+      temp_hum_init();
       zilog_init();
-      //humidity_init();
       sample_count = 0;
       
       wifi_sleep();
-      STATE = READ;
+      STATE = READ;  
       break;
       
     case READ:
@@ -83,7 +82,7 @@ void loop()
     case SEND:
       //debug.println("State: Send");
       wifly.setOUTPUT("0x30 0x70");
-      if(wifi_send(temp_read(), zilog_process(&presence_array[0], motion_thresh), ldr_read(), 50)) //dummy humidity
+      if(wifi_send(temp_read(), zilog_process(&presence_array[0], motion_thresh), ldr_read(), hum_read())) //dummy humidity
       {
         wifly.setOUTPUT("0x10 0x70");
         sample_count = 0;

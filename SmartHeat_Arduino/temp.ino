@@ -1,20 +1,20 @@
 #include <Wire.h>
 
 /* Device Adress */
-int adr = 31; //0x1F or 0b11111
+int adr_temp = 31; //0x1F or 0b11111
 
 void temp_init()
 {
   Wire.begin();
 }
 
-double temp_read()
+double temp_read_old()
 {
-  Wire.beginTransmission(adr);
+  Wire.beginTransmission(adr_temp);
   Wire.write(byte(0x05));  //request ambient temperature
   Wire.endTransmission();
   
-  Wire.requestFrom(adr, 2);
+  Wire.requestFrom(adr_temp, 2);
   if(Wire.available() >= 2)
   {
     byte upperByte, lowerByte;
