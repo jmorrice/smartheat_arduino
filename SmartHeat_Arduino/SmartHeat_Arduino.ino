@@ -11,7 +11,7 @@ boolean presence_array [30];
 unsigned int t_transmit_min = 2;  //transimission period in minutes
 unsigned int t_transmit = t_transmit_min * 60;  //in seconds
 unsigned int t_motion = 4;    //motion sample period in seconds
-unsigned int motion_thresh = 3;  //threshold for motion detection
+unsigned int motion_thresh = 10;  //threshold for motion detection
 
 /* Serial for ZMotion detection */
 SoftwareSerial zilog(2, 3);
@@ -26,18 +26,10 @@ unsigned int sample_count = 0;
 
 void setup()
 {
-  //softwareserial for debugging (not compatible with zmotion)
-  //debug.begin(9600);
-  //debug.println("setup");
-  //Serial.begin(9600);
-  //Serial.println("begin");
 }
 
 void loop()
 {
-  //debug.println("loop");
-  //to debug server response
-  //wifi_read();
   
   switch(STATE)
   {
@@ -68,9 +60,6 @@ void loop()
     case WAKE:
       if(sample_count * t_motion >= t_transmit)
       {
-        //wifly.println(sample_count);
-        //wifly.println(t_motion);
-        //wifly.println(t_transmit);
         wifi_wake();
         timeout_start();
         STATE = SEND;
